@@ -44,6 +44,7 @@ This project is a Flask-based API that can be used for basic as well as enterpri
 6. Run the application:
    ```
    python run.py
+   DEBUG=True python run.py
    ```
 
 ## Project Structure
