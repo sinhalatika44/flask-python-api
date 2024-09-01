@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-from flask_restx import Api, Resource
+from flask_restx import Api, Resource, Namespace
 from config import Config
 import platform
 import pkg_resources
@@ -26,6 +26,19 @@ def create_app(config_class=Config):
     from app.routes import auth
     app.register_blueprint(auth.bp)
 
+    # Import and initialize news and gold price services
+    from app.services.news_service import NewsService
+    from app.services.gold_price_service import GoldPriceService
+    news_service = NewsService()
+    gold_price_service = GoldPriceService()
+
+    # Create namespaces for different API sections
+    news_ns = Namespace('news', description='News operations')
+    gold_ns = Namespace('gold', description='Gold price operations')
+
+    api.add_namespace(news_ns)
+    api.add_namespace(gold_ns)
+
     @api.route('/')
     class Home(Resource):
         def get(self):
@@ -39,6 +52,30 @@ def create_app(config_class=Config):
                 "python_version": platform.python_version(),
                 "flask_version": flask_version
             }, 200
+
+    @news_ns.route('/')
+    class NewsList(Resource):
+        def get(self):
+            """Get all news"""
+            return news_service.get_news()
+
+    @news_ns.route('/<string:category>')
+    class NewsCategory(Resource):
+        def get(self, category):
+            """Get news by category"""
+            return news_service.get_news(category)
+
+    @news_ns.route('/<string:category>/<path:article_link_path>')
+    class NewsArticle(Resource):
+        def get(self, category, article_link_path):
+            """Get full article content (placeholder)"""
+            return {"message": f"Full article content for category: {category}, path: {article_link_path}"}
+
+    @gold_ns.route('/prices')
+    class GoldPrices(Resource):
+        def get(self):
+            """Get gold prices for major Indian cities"""
+            return gold_price_service.get_gold_prices()
 
     return app
 
