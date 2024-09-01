@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quanta by Rishant Technologies</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Other head elements like title, meta tags, etc. -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
     <header>
-        <h1>Quanta Project</h1>
+        <img src="{{ url_for('static', filename='images/quanta_logo.png') }}" alt="Quanta Logo" class="logo">
+        <!-- <h1>Quanta Project</h1> -->
     </header>
     <main>
         <section class="description">

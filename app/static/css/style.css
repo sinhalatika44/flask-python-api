@@ -16,6 +16,12 @@ header {
     text-align: center;
 }
 
+.logo {
+    height: 70px; /* Reduced height */
+    width: auto; /* Maintain aspect ratio */
+    margin-right: 15px;
+}
+
 main {
     flex: 1;
     padding: 2rem;
