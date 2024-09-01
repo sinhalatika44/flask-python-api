@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource, Namespace
@@ -12,7 +12,8 @@ api = Api(
     title='Flask API Boilerplate',
     version='1.0',
     description='A boilerplate for Flask APIs with Swagger UI',
-    doc='/swagger/'
+    doc='/swagger/',
+    prefix='/api'  # Add this line to prefix all API routes
 )
 
 def create_app(config_class=Config):
@@ -39,7 +40,19 @@ def create_app(config_class=Config):
     api.add_namespace(news_ns)
     api.add_namespace(gold_ns)
 
-    @api.route('/')
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    @app.route('/api/waitlist', methods=['POST'])
+    def join_waitlist():
+        email = request.json.get('email')
+        # TODO: Add email to the database
+        # For now, we'll just print it
+        print(f"Email added to waitlist: {email}")
+        return jsonify({"message": "Thank you for joining our waitlist!"})
+
+    @api.route('/home')
     class Home(Resource):
         def get(self):
             """Welcome endpoint with API information"""
