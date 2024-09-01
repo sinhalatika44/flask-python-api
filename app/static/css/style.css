@@ -36,18 +36,21 @@ h1 {
     margin-bottom: 2rem;
 }
 
-button {
+.btn-primary {
     background-color: #3498db;
     color: #ffffff;
     border: none;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
+.btn-primary:hover {
     background-color: #2980b9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .waitlist-form {
@@ -60,6 +63,8 @@ input[type="email"] {
     width: 100%;
     max-width: 300px;
     margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 footer {
@@ -69,8 +74,74 @@ footer {
     margin-top: auto;
 }
 
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
 @media (max-width: 600px) {
     main {
         padding: 1rem;
     }
+}
+
+.thank-you-message {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.thank-you-message h2 {
+    color: #2e7d32;
+    margin-bottom: 1rem;
+}
+
+.waitlist-status {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.content h2, .content h3 {
+    color: #2c3e50;
+    margin-top: 2rem;
+}
+
+.content ul {
+    margin-left: 2rem;
+}
+
+footer nav {
+    margin-top: 1rem;
+}
+
+footer nav a {
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
+
+footer nav a:hover {
+    text-decoration: underline;
 }

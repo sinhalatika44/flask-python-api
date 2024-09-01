@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource, Namespace
@@ -43,12 +43,21 @@ def create_app(config_class=Config):
     @app.route('/')
     def index():
         return render_template('index.html')
+    
+    @app.route('/privacy')
+    def privacy():
+        return render_template('privacy.html')
+
+    @app.route('/terms')
+    def terms():
+        return render_template('terms.html')
 
     @app.route('/api/waitlist', methods=['POST'])
     def join_waitlist():
         email = request.json.get('email')
         # TODO: Add email to the database
-        # For now, we'll just print it
+        # For now, we'll just store it in the session
+        session['waitlist_email'] = email
         print(f"Email added to waitlist: {email}")
         return jsonify({"message": "Thank you for joining our waitlist!"})
 

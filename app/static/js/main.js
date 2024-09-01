@@ -2,11 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const waitlistBtn = document.getElementById('waitlistBtn');
     const waitlistForm = document.querySelector('.waitlist-form');
     const form = document.getElementById('waitlistForm');
+    const toast = document.getElementById('toast');
+    const thankYouMessage = document.getElementById('thankYouMessage');
 
-    waitlistBtn.addEventListener('click', function() {
-        waitlistForm.style.display = 'block';
-        waitlistBtn.style.display = 'none';
-    });
+    if (waitlistBtn) {
+        waitlistBtn.addEventListener('click', function() {
+            waitlistForm.style.display = 'block';
+            waitlistBtn.style.display = 'none';
+        });
+    }
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -21,14 +25,31 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);
+            showToast(data.message);
             form.reset();
             waitlistForm.style.display = 'none';
-            waitlistBtn.style.display = 'block';
+            thankYouMessage.style.display = 'block';
+            
+            // Update the UI to reflect the user is now on the waitlist
+            const ctaSection = document.querySelector('.cta');
+            ctaSection.innerHTML = '<p class="waitlist-status">You\'re already on the waitlist!</p>';
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showToast('An error occurred. Please try again.');
         });
     });
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
 });
