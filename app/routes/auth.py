@@ -1,4 +1,4 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, render_template, redirect, url_for, flash
 from flask_restx import Resource, Namespace
 from flask_jwt_extended import create_access_token
 from app.models.user import User
@@ -13,6 +13,29 @@ auth_service = AuthService()
 
 bp = Blueprint('auth', __name__)
 
+# Web routes
+@bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            access_token = create_access_token(identity=user.id)
+            # Here you would typically set the token in a cookie or return it to the client
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Invalid username or password.', 'error')
+    return render_template('login.html')
+
+@bp.route('/google_login', methods=['POST'])
+def google_login():
+    # This route will handle the Google Sign-In callback
+    flash('Logged in with Google successfully.', 'success')
+    return redirect(url_for('main.index'))
+
+# API routes
 @auth_ns.route('/register')
 class Register(Resource):
     @auth_ns.expect(user_schema)
@@ -29,8 +52,8 @@ class Register(Resource):
         
         return user_schema.dump(new_user), 201
 
-@auth_ns.route('/login')
-class Login(Resource):
+@auth_ns.route('/api_login')
+class ApiLogin(Resource):
     @auth_ns.expect(user_schema)
     def post(self):
         """Login and receive an access token"""

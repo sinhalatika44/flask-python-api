@@ -1,7 +1,7 @@
 from http.client import HTTPException
 import time as time_module
 import traceback
-from flask import Flask, g, jsonify, render_template, request, session
+from flask import Blueprint, Flask, g, jsonify, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource, Namespace
@@ -32,8 +32,15 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     api.init_app(app)
 
-    from app.routes import auth
+    # from app.routes import auth
+    # app.register_blueprint(auth.bp)
+
+    # Import and register blueprints
+    from app.routes import auth, main
     app.register_blueprint(auth.bp)
+    app.register_blueprint(main.bp)
+
+    bp = Blueprint('auth', __name__)
 
     # Import and initialize news and gold price services
     from app.services.news_service import NewsService
@@ -59,6 +66,11 @@ def create_app(config_class=Config):
     @app.route('/terms')
     def terms():
         return render_template('terms.html')
+    
+    # @app.route('/login')
+    # def login():
+    #     app.logger.info("Login page route called")
+    #     return render_template('login.html')
 
     @app.route('/api/waitlist', methods=['POST'])
     def join_waitlist():
