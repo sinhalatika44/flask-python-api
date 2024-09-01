@@ -1,9 +1,13 @@
-from flask import Flask, jsonify, render_template, request, session
+from http.client import HTTPException
+import time as time_module
+import traceback
+from flask import Flask, g, jsonify, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_restx import Api, Resource, Namespace
 from config import Config
 import platform
+import logging
 import pkg_resources
 
 db = SQLAlchemy()
@@ -13,8 +17,12 @@ api = Api(
     version='1.0',
     description='A boilerplate for Flask APIs with Swagger UI',
     doc='/swagger/',
-    prefix='/api'  # Add this line to prefix all API routes
+    prefix='/api'
 )
+
+# Set up logging
+logging.basicConfig(filename='app.log', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -98,6 +106,69 @@ def create_app(config_class=Config):
         def get(self):
             """Get gold prices for major Indian cities"""
             return gold_price_service.get_gold_prices()
+        
+    @app.before_request
+    def before_request():
+        g.start_time = time_module.time()
+
+    @app.after_request
+    def after_request(response):
+        # Calculate request duration
+        duration = time_module.time() - g.start_time
+        
+        # Log request and response details
+        log_data = {
+            'method': request.method,
+            'path': request.path,
+            'status_code': response.status_code,
+            'duration': f"{duration:.4f}s",
+            'ip': request.remote_addr,
+            'user_agent': request.user_agent.string,
+            'referrer': request.referrer,
+            'request_headers': dict(request.headers),
+            'response_headers': dict(response.headers)
+        }
+        
+        logger.info(f"Request-Response: {log_data}")
+        
+        return response
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # Capture all exceptions
+        if isinstance(e, HTTPException):
+            # Handle HTTP errors
+            response = e.get_response()
+            error_data = {
+                'code': e.code,
+                'name': e.name,
+                'description': e.description,
+            }
+        else:
+            # Handle non-HTTP errors
+            response = app.response_class(
+                response=str(e),
+                status=500,
+            )
+            error_data = {
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            }
+        
+        # Log error details
+        log_data = {
+            'method': request.method,
+            'path': request.path,
+            'error': error_data,
+            'ip': request.remote_addr,
+            'user_agent': request.user_agent.string,
+            'referrer': request.referrer,
+            'request_headers': dict(request.headers)
+        }
+        
+        logger.error(f"Error: {log_data}")
+        
+        return response    
 
     return app
 
